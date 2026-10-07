@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Calculadora 3D — Jobway</title>
+<style>
+  :root{
+    --azul:#170278;
+    --azul-claro:#2c0fb8;
+    --laranja:#ED7F35;
+    --laranja-claro:#ffb27a;
+    --bg:#f5f6fa;
+    --card:#ffffff;
+    --texto:#1c1c28;
+    --texto-suave:#6b6b7c;
+    --borda:#e5e5ee;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--texto);
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+  header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .logo-dot{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,var(--azul),var(--azul-claro));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:18px;
+    flex-shrink:0;
+  }
+  h1{font-size:20px;margin:0;color:var(--azul);}
+  header p{margin:2px 0 0;font-size:13px;color:var(--texto-suave);}
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap:20px;
+  }
+  @media (max-width:760px){ .grid{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--borda);
+    border-radius:14px;
+    padding:20px;
+  }
+  .card h2{
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--azul);
+    margin:0 0 16px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h2::before{
+    content:"";
+    width:4px;height:16px;background:var(--laranja);border-radius:2px;
+  }
+
+  .field{margin-bottom:14px;}
+  .field label{
+    display:flex;justify-content:space-between;
+    font-size:13px;color:var(--texto);margin-bottom:5px;
+  }
+  .field label span.hint{color:var(--texto-suave);font-weight:400;}
+  .field input{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--borda);
+    border-radius:8px;
+    font-size:14px;
+    background:#fbfbfe;
+    color:var(--texto);
+  }
+  .field input:focus{
+    outline:none;border-color:var(--azul-claro);
+    box-shadow:0 0 0 3px rgba(23,2,120,0.08);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .divider{
+    height:1px;background:var(--borda);margin:16px 0;
+  }
+
+  /* Resultado */
+  .result-card{
+    background:linear-gradient(160deg,var(--azul) 0%, #23049c 100%);
+    color:#fff;
+    position:sticky;
+    top:16px;
+  }
+  .result-card h2{color:var(--laranja-claro);}
+  .result-card h2::before{background:var(--laranja-claro);}
+
+  .line{
+    display:flex;justify-content:space-between;
+    font-size:13px;padding:6px 0;
+    border-bottom:1px dashed rgba(255,255,255,0.15);
+    color:rgba(255,255,255,0.85);
+  }
+  .line span:last-child{font-weight:600;color:#fff;}
+
+  .big{
+    margin-top:16px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:10px;
+    padding:14px 16px;
+  }
+  .big .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--laranja-claro);}
+  .big .val{font-size:28px;font-weight:800;margin-top:4px;}
+  .big.custo{
+    background:rgba(255,255,255,0.05);
+    margin-bottom:10px;
+  }
+  .big.custo .val{font-size:20px;color:#fff;}
+  .margem-tag{
+    display:inline-block;margin-top:8px;
+    font-size:12px;padding:3px 9px;border-radius:20px;
+    background:var(--laranja);color:#fff;font-weight:700;
+  }
+
+  .footer-note{
+    margin-top:8px;font-size:11.5px;color:rgba(255,255,255,0.55);
+    line-height:1.5;
+  }
+
+  select{
+    width:100%;padding:9px 11px;border:1px solid var(--borda);
+    border-radius:8px;font-size:14px;background:#fbfbfe;color:var(--texto);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo-dot">J</div>
+    <div>
+      <h1>Calculadora de Custo &amp; Preço — Impressão 3D</h1>
+      <p>Jobway Tecnologia · preencha os campos e o preço sugerido atualiza sozinho</p>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- COLUNA ESQUERDA: inputs -->
+    <div>
+      <div class="card" style="margin-bottom:18px;">
+        <h2>Material</h2>
+        <div class="row2">
+          <div class="field">
+            <label>Peso da peça <span class="hint">gramas</span></label>
+            <input type="number" id="peso" value="50" min="0" step="1">
+          </div>
+          <div class="field">
+            <label>Cor / tipo do filamento</label>
+            <select id="corFilamento">
+              <option value="90">Padrão (maioria das cores) — R$90/kg</option>
+              <option value="170">Azul metálico cobalto — R$170/kg</option>
+              <option value="130">Fosco marrom cacau — R$130/kg</option>
+              <option value="custom">Outro (definir preço manual)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" id="campoManual" style="display:none;">
+          <label>Preço manual do filamento <span class="hint">R$/kg</span></label>
+          <input type="number" id="precoFilamento" value="90" min="0" step="1">
+        </div>
+        <div class="field">
+          <label>Desperdício / falha de impressão <span class="hint">%</span></label>
+          <input type="number" id="desperdicio" value="0" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <h2>Impressora &amp; Energia</h2>
+        <div class="row2">
+          <div class="field">
+            <label>Tempo de impressão <span class="hint">horas</span></label>
+            <input type="number" id="tempo" value="3" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label>Potência da impressora <span class="hint">watts</span></label>
+            <input type="number" id="potencia" value="200" min="0" step="10">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Preço da energia <span class="hint">R$/kWh</span></label>
+            <input type="number" id="precoEnergia" value="0.85" min="0" step="0.01">
+          </div>
+          <div class="field">
+            <label>Depreciação/manutenção <span class="hint">R$/hora</span></label>
+            <input type="number" id="depreciacao" value="1.5" min="0" step="0.1">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Mão de obra e margem</h2>
+        <div class="row2">
+          <div class="field">
+            <label>Tempo de trabalho manual <span class="hint">minutos — fora da impressora</span></label>
+            <input type="number" id="tempoMO" value="20" min="0" step="5">
+          </div>
+          <div class="field">
+            <label>Valor da hora <span class="hint">R$/hora</span></label>
+            <input type="number" id="valorHora" value="25" min="0" step="1">
+          </div>
+        </div>
+        <div class="field">
+          <label>Markup sobre o custo <span class="hint">%</span></label>
+          <input type="number" id="markup" value="100" min="0" step="5">
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA DIREITA: resultado -->
+    <div class="card result-card">
+      <h2>Resultado</h2>
+
+      <div class="line"><span>Filamento</span><span id="rFilamento">R$ 0,00</span></div>
+      <div class="line"><span>Energia</span><span id="rEnergia">R$ 0,00</span></div>
+      <div class="line"><span>Depreciação/manutenção</span><span id="rDeprec">R$ 0,00</span></div>
+      <div class="line"><span>Mão de obra</span><span id="rMO">R$ 0,00</span></div>
+      <div class="line"><span>Desperdício aplicado</span><span id="rDesperdicio">R$ 0,00</span></div>
+
+      <div class="big custo">
+        <div class="lbl">Custo total</div>
+        <div class="val" id="rCustoTotal">R$ 0,00</div>
+      </div>
+
+      <div class="big">
+        <div class="lbl">Preço de venda sugerido</div>
+        <div class="val" id="rPrecoVenda">R$ 0,00</div>
+        <div class="margem-tag" id="rMargem">lucro R$ 0,00</div>
+      </div>
+
+      <p class="footer-note">
+        Custo total = filamento + energia + depreciação + mão de obra, acrescido do % de desperdício.<br>
+        Preço de venda = custo total × (1 + markup).
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value) || 0; }
+function brl(v){ return v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}); }
+
+const selectCor = document.getElementById('corFilamento');
+const campoManual = document.getElementById('campoManual');
+selectCor.addEventListener('change', () => {
+  campoManual.style.display = selectCor.value === 'custom' ? 'block' : 'none';
+  calcular();
+});
+
+function calcular(){
+  const peso = num('peso');
+  const precoFilamento = selectCor.value === 'custom' ? num('precoFilamento') : parseFloat(selectCor.value);
+  const desperdicioPct = num('desperdicio');
+  const tempo = num('tempo');
+  const potencia = num('potencia');
+  const precoEnergia = num('precoEnergia');
+  const deprecHora = num('depreciacao');
+  const tempoMO = num('tempoMO') / 60;
+  const valorHora = num('valorHora');
+  const markupPct = num('markup');
+
+  const custoFilamento = (peso/1000) * precoFilamento;
+  const custoEnergia = tempo * (potencia/1000) * precoEnergia;
+  const custoDeprec = tempo * deprecHora;
+  const custoMO = tempoMO * valorHora;
+
+  const subtotal = custoFilamento + custoEnergia + custoDeprec + custoMO;
+  const valorDesperdicio = subtotal * (desperdicioPct/100);
+  const custoTotal = subtotal + valorDesperdicio;
+
+  const precoVenda = custoTotal * (1 + markupPct/100);
+  const lucro = precoVenda - custoTotal;
+
+  document.getElementById('rFilamento').textContent = brl(custoFilamento);
+  document.getElementById('rEnergia').textContent = brl(custoEnergia);
+  document.getElementById('rDeprec').textContent = brl(custoDeprec);
+  document.getElementById('rMO').textContent = brl(custoMO);
+  document.getElementById('rDesperdicio').textContent = brl(valorDesperdicio);
+  document.getElementById('rCustoTotal').textContent = brl(custoTotal);
+  document.getElementById('rPrecoVenda').textContent = brl(precoVenda);
+  document.getElementById('rMargem').textContent = 'lucro ' + brl(lucro);
+}
+
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', calcular));
+calcular();
+</script>
+</body>
+</html>
